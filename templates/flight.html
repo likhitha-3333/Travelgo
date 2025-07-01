@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TravelGo - Flight Booking</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+    }
+
+    .navbar, .search-card, .flight-card, .flights-header {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+
+    .page-header {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #2c3e50;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    .search-card {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .search-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #444;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .trip-type {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .trip-type label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .search-btn {
+      margin-top: 1.5rem;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .search-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .flights-header {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .flight-card {
+      padding: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .flight-card .price {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .book-btn {
+      background: #27ae60;
+      color: white;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .book-btn:hover {
+      background: #219150;
+    }
+
+    .no-flights, .loading, .flight-confirmation {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .no-flights {
+      background: white;
+      border-radius: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .search-form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1><i class="fas fa-plane"></i> Book Your Flight</h1>
+    <p>Search and book the best flight deals</p>
+  </div>
+
+  <div class="search-card">
+    <form onsubmit="searchFlights(event)">
+      <div class="trip-type">
+        <label><input type="radio" name="trip_type" value="round_trip" checked /> Round Trip</label>
+        <label><input type="radio" name="trip_type" value="one_way" /> One Way</label>
+      </div>
+
+      <div class="search-form">
+        <div class="form-group">
+          <label for="from">From</label>
+          <input type="text" id="from" name="from" placeholder="Departure city" required />
+        </div>
+        <div class="form-group">
+          <label for="to">To</label>
+          <input type="text" id="to" name="to" placeholder="Destination city" required />
+        </div>
+        <div class="form-group">
+          <label for="departure_date">Departure Date</label>
+          <input type="date" id="departure_date" name="departure_date" required />
+        </div>
+        <div class="form-group return-date">
+          <label for="return_date">Return Date</label>
+          <input type="date" id="return_date" name="return_date" />
+        </div>
+        <div class="form-group">
+          <label for="passengers">Passengers</label>
+          <select id="passengers" name="passengers">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="class">Class</label>
+          <select id="class" name="class">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+            <option value="first">First</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="search-btn" type="submit">
+        <i class="fas fa-search"></i> Search Flights
+      </button>
+    </form>
+  </div>
+
+  <div class="loading" id="loading" style="display: none;">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Loading flights...</p>
+  </div>
+
+  <div class="no-flights" id="no-flights" style="display: none;">
+    <i class="fas fa-plane-slash" style="font-size: 3rem; color: #ccc;"></i>
+    <p>No flights found. Try different search criteria.</p>
+  </div>
+
+  <div id="flights-container"></div>
+
+  <script>
+    const sampleFlights = [
+      {
+        id: 'AI101',
+        airline: 'Air India',
+        from: 'Delhi',
+        to: 'Mumbai',
+        departure_time: '08:30',
+        arrival_time: '11:00',
+        duration: '2h 30m',
+        price: 4500,
+        class: 'economy',
+        features: ['Wi-Fi', 'Meal', 'Entertainment']
+      }
+    ];
+
+    function searchFlights(event) {
+      event.preventDefault();
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('flights-container').innerHTML = '';
+      document.getElementById('no-flights').style.display = 'none';
+
+      setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+        if (sampleFlights.length > 0) {
+          displayFlights(sampleFlights);
+        } else {
+          document.getElementById('no-flights').style.display = 'block';
+        }
+      }, 1500);
+    }
+
+    function displayFlights(flights) {
+      const container = document.getElementById('flights-container');
+      flights.forEach(flight => {
+        const card = document.createElement('div');
+        card.className = 'flight-card';
+        card.innerHTML = `
+          <h3>${flight.airline} (${flight.id})</h3>
+          <p>${flight.from} ➜ ${flight.to}</p>
+          <p>Departure: ${flight.departure_time} | Arrival: ${flight.arrival_time}</p>
+          <p>Duration: ${flight.duration}</p>
+          <p class="price">₹${flight.price.toLocaleString()}</p>
+          <button class="book-btn" onclick="alert('Flight booked!')">Book Now</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
