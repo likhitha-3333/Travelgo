@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TravelGo - Train Booking</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      padding: 30px;
+      color: white;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      margin-top: 10px;
+      opacity: 0.9;
+    }
+
+    .nav-buttons {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid white;
+      padding: 10px 20px;
+      color: white;
+      border-radius: 20px;
+      margin-left: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .search-section {
+      background: #ecf0f1;
+      padding: 40px 30px;
+    }
+
+    .search-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      font-size: 15px;
+    }
+
+    .search-btn {
+      grid-column: 1 / -1;
+      padding: 14px;
+      background: #00b894;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .search-btn:hover {
+      background: #009e7f;
+    }
+
+    .results-section {
+      padding: 30px;
+      background: white;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .results-count {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: #2d3436;
+    }
+
+    .filter-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid #00cec9;
+      color: #00cec9;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: #00cec9;
+      color: white;
+    }
+
+    .train-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .train-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .train-name {
+      font-size: 1.3em;
+      font-weight: 600;
+      color: #0984e3;
+    }
+
+    .train-number {
+      font-size: 0.9em;
+      color: #636e72;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 0.75em;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .on-time {
+      background: #dff9fb;
+      color: #00b894;
+    }
+
+    .delayed {
+      background: #ffeaa7;
+      color: #d63031;
+    }
+
+    .journey-details {
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+      font-size: 0.95em;
+    }
+
+    .class-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .class-card {
+      padding: 10px;
+      border-radius: 8px;
+      background: white;
+      border: 2px solid #dcdde1;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .class-card:hover {
+      border-color: #00cec9;
+      transform: translateY(-2px);
+    }
+
+    .class-card.selected {
+      background: #dff9fb;
+      border-color: #00b894;
+    }
+
+    .book-train-btn {
+      margin-top: 15px;
+      background: #55efc4;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 10px;
+      font-weight: bold;
+      color: #2d3436;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .book-train-btn:hover {
+      background: #00b894;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .train-header,
+      .journey-details {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .form-group {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="nav-buttons">
+        <a href="dashboard.html" class="nav-btn"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="logout.html" class="nav-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+      <h1><i class="fas fa-train"></i> Train Booking</h1>
+      <p>Book your journey with ease and speed</p>
+    </div>
+
+    <div class="search-section">
+      <form class="search-form" onsubmit="event.preventDefault(); showSampleResults();">
+        <div class="form-group">
+          <label for="from">From Station</label>
+          <input type="text" id="from" placeholder="Start station" required>
+        </div>
+        <div class="form-group">
+          <label for="to">To Station</label>
+          <input type="text" id="to" placeholder="Destination station" required>
+        </div>
+        <div class="form-group">
+          <label for="date">Travel Date</label>
+          <input type="date" id="date" required>
+        </div>
+        <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search Trains</button>
+      </form>
+    </div>
+
+    <div class="results-section" id="results">
+      <div class="results-header">
+        <div class="results-count" id="resultsCount">Found 0 trains</div>
+        <div class="filter-options">
+          <button class="filter-btn active" onclick="filterResults('all')">All</button>
+          <button class="filter-btn" onclick="filterResults('superfast')">Superfast</button>
+          <button class="filter-btn" onclick="filterResults('express')">Express</button>
+        </div>
+      </div>
+      <div id="trainList">
+        <!-- Results go here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const trainData = [
+      {
+        name: "Rajdhani Express",
+        number: "12301",
+        type: "superfast",
+        status: "on-time",
+        from: "New Delhi (NDLS)",
+        to: "Howrah (HWH)",
+        duration: "17h 15m",
+        classes: ["1A", "2A", "3A"]
+      },
+      {
+        name: "Shatabdi Express",
+        number: "12002",
+        type: "superfast",
+        status: "on-time",
+        from: "Delhi (DLI)",
+        to: "Chandigarh (CDG)",
+        duration: "3h 40m",
+        classes: ["CC", "EC"]
+      },
+      {
+        name: "Duronto Express",
+        number: "12273",
+        type: "express",
+        status: "delayed",
+        from: "New Delhi (NDLS)",
+        to: "Sealdah (SDAH)",
+        duration: "19h 50m",
+        classes: ["SL", "3A", "2A"]
+      }
+    ];
+
+    function showSampleResults() {
+      const list = document.getElementById('trainList');
+      list.innerHTML = '';
+      trainData.forEach(train => {
+        const card = document.createElement('div');
+        card.className = 'train-card';
+        card.dataset.type = train.type;
+        card.innerHTML = `
+          <div class="train-header">
+            <div>
+              <div class="train-name">${train.name}</div>
+              <div class="train-number">${train.number}</div>
+            </div>
+            <span class="status-badge ${train.status === 'on-time' ? 'on-time' : 'delayed'}">
+              ${train.status === 'on-time' ? 'On Time' : 'Delayed'}
+            </span>
+          </div>
+          <div class="journey-details">
+            <div>${train.from}</div>
+            <div>${train.duration}</div>
+            <div>${train.to}</div>
+          </div>
+          <div class="class-options">
+            ${train.classes.map(c => `<div class="class-card">${c}</div>`).join('')}
+          </div>
+          <button class="book-train-btn">Book Now</button>
+        `;
+        list.appendChild(card);
+      });
+      document.getElementById('resultsCount').textContent = `Found ${trainData.length} trains`;
+    }
+
+    function filterResults(type) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.querySelectorAll('.train-card').forEach(card => {
+        card.style.display = (type === 'all' || card.dataset.type === type) ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
